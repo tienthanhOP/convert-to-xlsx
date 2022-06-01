@@ -1,50 +1,13 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Button, Form, Input, Table, Typography } from "antd";
-import { convertTextToObject } from "./utils";
+
+import { convertTextToObject, downloadXLSX } from "./utils";
 const { Paragraph } = Typography;
 
 const validateMessages = {
   required: "Bạn chưa nhập thông tin đơn hàng!",
 };
-
-const columns = [
-  {
-    title: "Người nhận",
-    dataIndex: "receiver",
-    key: "receiver",
-  },
-  {
-    title: "Địa chỉ",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Số điện thoại",
-    dataIndex: "phone",
-    key: "phone",
-  },
-  {
-    title: "Thỉnh",
-    dataIndex: "buying",
-    key: "buying",
-  },
-  {
-    title: "Phí ship",
-    dataIndex: "freeship",
-    key: "freeship",
-  },
-  {
-    title: "Tổng giá",
-    dataIndex: "price",
-    key: "price",
-  },
-  {
-    title: "Thông tin thanh toán",
-    dataIndex: "paid",
-    key: "paid",
-  },
-];
 
 const App = () => {
   const [orders, setOrders] = useState([]);
@@ -57,28 +20,54 @@ const App = () => {
     }
   };
 
-  const _renderSample = () => {
-    return (
-      <Paragraph className="flex-1 justify-start items-start text-left">
-        <pre>
-          Vậy em chốt đơn của chị nhé
-          <br />
-          Thông tin đơn hàng
-          <br />
-          Người nhận: ...
-          <br />
-          Địa chỉ: ...
-          <br />
-          THỈNH: ...
-          <br />
-          Phí ship bên vận chuyển thu ạ
-          <br />
-          Chị kiểm tra lại giúp em xem thông tin đã chính xác chưa ạ, để em ship
-          sớm cho chị nha
-        </pre>
-      </Paragraph>
-    );
-  };
+  const onDelete = (id) => {
+    setOrders(orders.filter(e => e.id !== id))
+  }
+
+  const columns = [
+    {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (value, item, index) => index + 1
+    },
+    {
+      title: "Mã vận đơn",
+      dataIndex: "freeship",
+      key: "freeship",
+    },
+    {
+      title: "Họ và tên",
+      dataIndex: "receiver",
+      key: "receiver",
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+      key: "address",
+    },
+    {
+      title: "SĐT",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Chi tiết",
+      dataIndex: "buying",
+      key: "buying",
+    },
+    {
+      title: "Tiền",
+      dataIndex: "price",
+      key: "price",
+    },
+    {
+      title: "",
+      dataIndex: "delete",
+      key: "delete",
+      render: (value, item) => <a onClick={() => onDelete(item.id)}>Xóa</a>
+    },
+  ];
 
   return (
     <div className="App p-3">
@@ -93,7 +82,7 @@ const App = () => {
                 },
               ]}
             >
-              <Input.TextArea rows={10} />
+              <Input.TextArea rows={8} />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">
@@ -102,12 +91,11 @@ const App = () => {
             </Form.Item>
           </Form>
         </div>
-        {_renderSample()}
       </div>
-      <Button type="primary" onClick={() => setOrders([])}>
-        Clear
+      <Button className="mb-2" type="primary" onClick={() => downloadXLSX(orders)}>
+        Tải về
       </Button>
-      <Table columns={columns} dataSource={orders} />
+      <Table columns={columns} dataSource={orders} size={100} />
     </div>
   );
 };
