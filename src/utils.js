@@ -95,14 +95,14 @@ export const convertTextToObject = (order) => {
     if (isNumeric(paidNumber)) {
       const tmp = parseInt(paidNumber) - parseInt(result.price);
       if (tmp >= 30) {
-        result.freeship = `đã ck ${paidNumber} cả ship`;
+        result.freeship = `đã ck ${paidNumber}k cả ship`;
       } else if (tmp < 0) {
-        result.freeship = `đã ck ${paidNumber} còn ${-tmp}k + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
+        result.freeship = `đã ck ${paidNumber}k còn ${-tmp}k + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
       } else {
-        result.freeship = `đã ck ${paidNumber} + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
+        result.freeship = `đã ck ${paidNumber}k + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
       }
     } else {
-      result.freeship = `đã ck ${result.price} + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
+      result.freeship = `đã ck ${result.price}k + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
     }
   } else {
     result.freeship = !isFreeship ? "Shipcod + phí ship người nhận trả" : "Shipcod + freeship";
