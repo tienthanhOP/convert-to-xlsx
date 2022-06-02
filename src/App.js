@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
-import { Button, Form, Input, Table, Typography } from "antd";
+import { Button, Empty, Form, Input, Space, Table, Typography } from "antd";
 
 import { convertTextToObject, downloadXLSX } from "./utils";
 const { Paragraph } = Typography;
@@ -10,7 +10,20 @@ const validateMessages = {
 };
 
 const App = () => {
+  const [form] = Form.useForm();
   const [orders, setOrders] = useState([]);
+
+  const onPasteAndAdd = () => {
+    navigator.clipboard.readText()
+      .then(text => {
+        form.setFieldsValue({
+          order: text,
+        });
+      })
+      .catch(err => {
+        console.error('Failed to read clipboard contents: ', err);
+      });
+  }
 
   const onFinish = (value) => {
     try {
@@ -69,11 +82,19 @@ const App = () => {
     },
   ];
 
+  const initialValues = {
+    order: '',
+  };
+
   return (
     <div className="App p-3">
       <div className="flex flex-row flex-1">
-        <div className="flex-1 mr-2">
-          <Form onFinish={onFinish} validateMessages={validateMessages}>
+        <div className="flex-1">
+          <Form
+            form={form}
+            initialValues={initialValues}
+            onFinish={onFinish}
+            validateMessages={validateMessages}>
             <Form.Item
               name={"order"}
               rules={[
@@ -85,17 +106,30 @@ const App = () => {
               <Input.TextArea rows={8} />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button className="mr-1" type="primary" onClick={onPasteAndAdd}>
+                Dán đơn hàng
+              </Button>
+              <Button className="ml-1" type="primary" htmlType="submit">
                 Thêm đơn hàng
               </Button>
             </Form.Item>
           </Form>
         </div>
       </div>
-      <Button className="mb-2" type="primary" onClick={() => downloadXLSX(orders)}>
-        Tải về
-      </Button>
-      <Table columns={columns} dataSource={orders} size={100} />
+      <Space
+        style={{
+          marginBottom: 16,
+        }}
+      >
+        <Button onClick={() => downloadXLSX(orders)}>Tải về Excel</Button>
+        <Button onClick={() => { }}>Xóa toàn bộ đơn</Button>
+      </Space>
+      <Table columns={columns} dataSource={orders} size={20} locale={{
+        emptyText: <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={"Bé iu chưa thêm đơn hàng nào :("}
+        />
+      }} />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { saveAs } from "file-saver";
 import XLSX from 'xlsx-populate/browser/xlsx-populate';
 import {
@@ -10,7 +11,29 @@ import {
 } from "./constants";
 
 export const convertTextToObject = (order) => {
-  const result = {};
+  const result = {
+    id: '',
+    freeship: '',
+    receiver: '',
+    address: '',
+    city: '',
+    phone: '',
+    gh: '',
+    sl: '',
+    buying: '',
+    no: '',
+    kl: '',
+    gift: '',
+    price: '',
+    shipPrice: '',
+    date: '',
+    note: '',
+    staff: 'Ngân',
+    closingStaff: '',
+  };
+  if (!order.includes(RECEIVER_TEXT) || !order.includes(ADDRESS_TEXT) || !order.includes(PHONE_NUMBER_TEXT) || !order.includes(BUYING_TEXT)) {
+    throw 'Thông tin đơn hàng sai rồi bé iu ơi, xem lại đi nèo!';
+  }
   result.id = uuidV4();
   result.receiver = order
     .substring(
@@ -59,9 +82,10 @@ export const convertTextToObject = (order) => {
       }
     }
   }
-  const paid = order.includes(PAID);
+  const paid = order.toLowerCase().includes(PAID);
+  const isFreeship = !order.includes(SHIP);
   if (paid) {
-    const txtAfterPaid = order.substring(
+    const txtAfterPaid = order.toLowerCase().substring(
       order.indexOf(PAID) + PAID.length,
       order.length
     );
@@ -70,7 +94,6 @@ export const convertTextToObject = (order) => {
       .trim();
     if (isNumeric(paidNumber)) {
       const tmp = parseInt(paidNumber) - parseInt(result.price);
-      const isFreeship = !order.includes(SHIP);
       if (tmp >= 30) {
         result.freeship = `đã ck ${paidNumber} cả ship`;
       } else if (tmp < 0) {
@@ -78,9 +101,11 @@ export const convertTextToObject = (order) => {
       } else {
         result.freeship = `đã ck ${paidNumber} + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
       }
+    } else {
+      result.freeship = `đã ck ${result.price} + ${isFreeship ? 'freeship' : 'phí ship người nhận trả'}`;
     }
   } else {
-    result.freeship = order.includes(SHIP) ? "Shipcod + phí ship người nhận trả" : "Shipcod + freeship";
+    result.freeship = !isFreeship ? "Shipcod + phí ship người nhận trả" : "Shipcod + freeship";
   }
 
   return result;
@@ -108,13 +133,21 @@ const getSheetData = (data, header) => {
 }
 
 export const downloadXLSX = async (orders) => {
+  orders = orders.map((order, index) => ({
+    ...order,
+    id: index + 1,
+    price: parseInt(order.price),
+    date: dayjs().format('DD/MM/YYYY')
+  }));
+
   let header = [
     "STT",
     "MÃ VẬN ĐƠN",
     "HỌ VÀ TÊN",
     "ĐỊA CHỈ",
     "TỈNH ĐẾN",
-    "SĐT", "GH",
+    "SĐT",
+    "GH",
     "SL",
     "CHI TIẾT",
     "NO",
@@ -134,11 +167,28 @@ export const downloadXLSX = async (orders) => {
     const totalColumns = sheetData[0].length;
 
     sheet1.cell("A1").value(sheetData);
-    const range = sheet1.usedRange();
+    sheet1.column("A").width(5);
+    sheet1.column("B").width(30);
+    sheet1.column("C").width(12);
+    sheet1.column("D").width(34);
+    sheet1.column("E").width(3);
+    sheet1.column("F").width(10);
+    sheet1.column("G").width(4);
+    sheet1.column("H").width(4);
+    sheet1.column("I").width(41);
+    sheet1.column("J").width(4);
+    sheet1.column("K").width(4);
+    sheet1.column("L").width(4);
+    sheet1.column("M").width(6);
+    sheet1.column("N").width(8);
+    sheet1.column("O").width(11);
+    sheet1.column("P").width(7);
+    sheet1.column("Q").width(8);
+    sheet1.column("R").width(7);
+
     const endColumn = String.fromCharCode(64 + totalColumns);
     sheet1.row(1).style("bold", true);
     sheet1.range("A1:" + endColumn + "1").style("fill", "FFFF00");
-    range.style("border", true);
     return workbook.outputAsync().then((res) => {
       saveAs(res, "file.xlsx");
     });

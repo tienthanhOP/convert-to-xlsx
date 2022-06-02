@@ -10,6 +10,7 @@
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto": "^1.0.1",
+    "dayjs": "^1.11.2",
     "file-saver": "^2.0.5",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
