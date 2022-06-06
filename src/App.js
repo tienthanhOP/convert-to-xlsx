@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { Button, Empty, Form, Input, Space, Table, Typography } from "antd";
 
@@ -13,7 +13,7 @@ const App = () => {
   const [form] = Form.useForm();
   const [orders, setOrders] = useState([]);
 
-  const onPasteAndAdd = () => {
+  const onPaste = () => {
     navigator.clipboard.readText()
       .then(text => {
         form.setFieldsValue({
@@ -27,14 +27,23 @@ const App = () => {
 
   const onFinish = (value) => {
     try {
-      setOrders([...orders, convertTextToObject(value.order)]);
+      const ordersTmp = [...orders, convertTextToObject(value.order)];
+      setOrders(ordersTmp);
+      localStorage.setItem("orders", JSON.stringify(ordersTmp));
     } catch (error) {
       alert(error);
     }
   };
 
   const onDelete = (id) => {
-    setOrders(orders.filter(e => e.id !== id))
+    const ordersTmp = orders.filter(e => e.id !== id);
+    setOrders(ordersTmp)
+    localStorage.setItem("orders", JSON.stringify(ordersTmp));
+  }
+
+  const onDeleteAll = () => {
+    setOrders([]);
+    localStorage.setItem("orders", "[]");
   }
 
   const columns = [
@@ -77,7 +86,7 @@ const App = () => {
     {
       title: "",
       dataIndex: "delete",
-      key: "delete",
+      key: "id",
       render: (value, item) => <a onClick={() => onDelete(item.id)}>Xóa</a>
     },
   ];
@@ -85,6 +94,18 @@ const App = () => {
   const initialValues = {
     order: '',
   };
+
+  useEffect(() => {
+    try {
+      const ordersLocal = localStorage.getItem("orders");
+      if (ordersLocal) {
+        const convertData = JSON.parse(ordersLocal);
+        setOrders(convertData);
+      }
+    } catch (error) {
+      console.log("🚀 ~ file: App.js ~ line 97 ~ useEffect ~ error", error)
+    }
+  }, []);
 
   return (
     <div className="App p-3">
@@ -106,7 +127,7 @@ const App = () => {
               <Input.TextArea rows={8} />
             </Form.Item>
             <Form.Item>
-              <Button className="mr-1" type="primary" onClick={onPasteAndAdd}>
+              <Button className="mr-1" type="primary" onClick={onPaste}>
                 Dán đơn hàng
               </Button>
               <Button className="ml-1" type="primary" htmlType="submit">
@@ -122,7 +143,7 @@ const App = () => {
         }}
       >
         <Button onClick={() => downloadXLSX(orders)}>Tải về Excel</Button>
-        <Button onClick={() => { }}>Xóa toàn bộ đơn</Button>
+        <Button onClick={onDeleteAll}>Xóa toàn bộ đơn</Button>
       </Space>
       <Table columns={columns} dataSource={orders} size={20} locale={{
         emptyText: <Empty

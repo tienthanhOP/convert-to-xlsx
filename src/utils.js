@@ -59,6 +59,11 @@ export const convertTextToObject = (order) => {
       order.indexOf(SHIP)
     )
     .trim();
+
+  if(result.buying.charAt(0) === '-') {
+    result.buying = result.buying.substring(1).trim();
+  }
+
   const kCharacter = "k";
   const equalSign = "=";
   if (result.buying.includes(equalSign)) {
