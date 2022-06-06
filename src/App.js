@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Button, Empty, Form, Input, Space, Table, Typography } from "antd";
+import { Button, Empty, Form, Input, Space, Table, Typography, message } from "antd";
 
 import { convertTextToObject, downloadXLSX } from "./utils";
 const { Paragraph } = Typography;
@@ -30,8 +30,9 @@ const App = () => {
       const ordersTmp = [...orders, convertTextToObject(value.order)];
       setOrders(ordersTmp);
       localStorage.setItem("orders", JSON.stringify(ordersTmp));
+      message.success('Thêm đơn thành công');
     } catch (error) {
-      alert(error);
+      message.error(error);
     }
   };
 
@@ -145,7 +146,7 @@ const App = () => {
         <Button onClick={() => downloadXLSX(orders)}>Tải về Excel</Button>
         <Button onClick={onDeleteAll}>Xóa toàn bộ đơn</Button>
       </Space>
-      <Table columns={columns} dataSource={orders} size={20} locale={{
+      <Table columns={columns} dataSource={orders} size={100} locale={{
         emptyText: <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={"Bé iu chưa thêm đơn hàng nào :("}

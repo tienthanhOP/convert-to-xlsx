@@ -31,7 +31,10 @@ export const convertTextToObject = (order) => {
     staff: 'Ngân',
     closingStaff: '',
   };
-  if (!order.includes(RECEIVER_TEXT) || !order.includes(ADDRESS_TEXT) || !order.includes(PHONE_NUMBER_TEXT) || !order.includes(BUYING_TEXT)) {
+  if (!order.toLowerCase().includes(RECEIVER_TEXT.toLowerCase())
+    || !order.toLowerCase().includes(ADDRESS_TEXT.toLowerCase())
+    || !order.toLowerCase().includes(PHONE_NUMBER_TEXT.toLowerCase())
+    || !order.toLowerCase().includes(BUYING_TEXT.toLowerCase())) {
     throw 'Thông tin đơn hàng sai rồi bé iu ơi, xem lại đi nèo!';
   }
   result.id = uuidV4();
@@ -60,7 +63,7 @@ export const convertTextToObject = (order) => {
     )
     .trim();
 
-  if(result.buying.charAt(0) === '-') {
+  if (result.buying.charAt(0) === '-') {
     result.buying = result.buying.substring(1).trim();
   }
 
